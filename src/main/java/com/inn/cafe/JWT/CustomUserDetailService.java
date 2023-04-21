@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.inn.cafe.dao.UserDao;
@@ -34,7 +35,9 @@ public class CustomUserDetailService implements UserDetailsService {
 		
 		if(!Objects.isNull(userDetail)){
 			
-			return new User(userDetail.getEmail(),userDetail.getPassword(),new ArrayList());    // not our Model User
+			log.error("number 3 : CustomUserDetailService class -->user Detail is in DB ");
+			
+			return new User(userDetail.getEmail(),new BCryptPasswordEncoder().encode(userDetail.getPassword()),new ArrayList());    // not our Model User
 		}
 		else {
 			throw new UsernameNotFoundException("User Not found");
@@ -43,6 +46,8 @@ public class CustomUserDetailService implements UserDetailsService {
 	
 	// to return the User
 	public com.inn.cafe.Model.User getUserDetail(){
+//		com.inn.cafe.Model.User user= userDetail;   
+//		user.setPassword(null);
 		return userDetail;
 	}
 

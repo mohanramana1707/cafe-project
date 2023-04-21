@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,18 +30,30 @@ public class SecurityConfig {                // same as application config in JW
 	
 	 // addded
 	// authentication based on CUSTOM User Details
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception{  
-		auth.userDetailsService(customUserDetailService);    // kind of registering our custom Userdetails
-	}
+//	protected void configure(AuthenticationManagerBuilder auth) throws Exception{  
+//		auth.userDetailsService(customUserDetailService);    // kind of registering our custom Userdetails
+//	}
+//	
 	
-	@Bean
+	@Bean  //1111111111111111111111
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {     
 		return config.getAuthenticationManager();
 		
 	}
 	
-//	@Bean
+	//22222222222222222222222222222(added extra)
+	@Bean
+	public AuthenticationProvider authenticationProvider() {               // responsibe for fetch userdetails and encode PASSWORD
+		
+		DaoAuthenticationProvider authProvider= new DaoAuthenticationProvider();
+		
+		authProvider.setUserDetailsService(customUserDetailService);//333333333333333333333333333333
+		authProvider.setPasswordEncoder(passwordEncoder());
+		return authProvider;
+	}
+	
 //	@Override
+//	@Bean
 //	public AuthenticationManager authenticationManagerBean() throws Exception {
 //		return super.authenticationManagerBean();
 //	}
@@ -61,11 +75,11 @@ public class SecurityConfig {                // same as application config in JW
 		   .and()
 			.csrf()
 			.disable()
-			.authorizeHttpRequests()
-			.requestMatchers("/user/login","/user/forgotPassword")  //,"/user/signup"
+			.authorizeHttpRequests()    // authorizing 
+			.requestMatchers("/user/login","/user/signup","/user/forgotPassword")  //,"/user/signup"
 			.permitAll()
 			
-			.anyRequest()
+			.anyRequest()    // authentication
 			.authenticated()
 			.and()
 			.exceptionHandling()
@@ -76,7 +90,10 @@ public class SecurityConfig {                // same as application config in JW
 		
 		http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 				
-			
+		//it adds a filter named jwtFilter before the UsernamePasswordAuthenticationFilter class in the filter chain of the HTTP request.
+		//The UsernamePasswordAuthenticationFilter is a built-in filter in Spring Security, a popular Java framework for securing web applications
+		//, which handles user authentication using a username and password. By adding the JWT filter before this filter,
+		//the application ensures that users are first authenticated using the JWT mechanism before attempting to authenticate using a traditional username and password.
 		return http.build();
 		
 	}
