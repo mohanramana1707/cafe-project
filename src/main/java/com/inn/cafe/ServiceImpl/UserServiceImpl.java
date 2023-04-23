@@ -15,6 +15,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
+import com.google.common.base.Strings;
 import com.inn.cafe.JWT.CustomUserDetailService;
 import com.inn.cafe.JWT.JwtFilter;
 import com.inn.cafe.JWT.JwtUtil;
@@ -234,9 +235,74 @@ public class UserServiceImpl  implements UserService{
 		
 		
 	}
+
+
 	
 //********************************************************************************************************************************************************************************************	
+	// validate the user
 	
+	
+	@Override
+	public ResponseEntity<String> checkToken() {
+		
+	
+		return CafeUtils.getResponseEntity("true", HttpStatus.OK);
+	}
+
+//********************************************************************************************************************************************************************************************	
+	// change the password.
+	
+	@Override
+	public ResponseEntity<String> changePassword(Map<String, String> requestMap) {
+		
+		try {
+			
+			User userObj = userDao.findByEmail(jwtFilter.getCurrentUser()); 
+			
+			if(!userObj.equals(null)) {
+				
+				if(userObj.getPassword().equals(requestMap.get("oldPassword"))) {
+					userObj.setPassword(requestMap.get("newPassword"));
+					userDao.save(userObj);
+					return CafeUtils.getResponseEntity("password updated successfully", HttpStatus.OK);
+					
+				}
+				return CafeUtils.getResponseEntity("Incorrect Old password",HttpStatus.INTERNAL_SERVER_ERROR );
+				
+			}
+			
+			return CafeUtils.getResponseEntity("User u looking to change password doesnt exists",HttpStatus.INTERNAL_SERVER_ERROR );
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
+//********************************************************************************************************************************************************************************************	
+// send mail to email id (error)
+	
+	@Override
+	public ResponseEntity<String> forgetPassword(Map<String, String> requestMap) {
+		try {
+			
+			User user=userDao.findByEmail(requestMap.get("email"));
+			
+			// the user should be in DB and it has to have email id
+			if(!Objects.isNull(user) && !Strings.isNullOrEmpty(user.getEmail())) {
+				
+				emailUtils.forgetMail(user.getEmail(),"Credentials for cafe Management", user.getPassword());
+				
+				
+			}
+			return CafeUtils.getResponseEntity("check your mail for credentials", HttpStatus.OK);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 	
 
 }

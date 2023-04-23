@@ -44,7 +44,7 @@ public class JwtFilter extends OncePerRequestFilter{
 		// no token validation is required(by passing the given end points) , directly goes to servelet then to controller
 		
 		// GENERATE Token
-		if(request.getServletPath().matches("/user/login | /user/signup ") ) {  //| /user/signup | /user/forgotPassword
+		if(request.getServletPath().matches("/user/login | /user/signup | /user/forgotPassword") ) {  //| /user/signup | /user/forgotPassword
 			
 			log.warn("inside IF ");
 			
@@ -66,7 +66,7 @@ public class JwtFilter extends OncePerRequestFilter{
 				log.warn("inside ELSE signup--- token is there");
 				
 				token=authorizationHeader.substring(7);
-				userName=jwtUtil.extractUserName(token);
+				userName=jwtUtil.extractUserName(token);  // that is email id
 				claims=jwtUtil.extractAllClaims(token);
 				
 				log.warn("inside ELSE signup---got UserName and claims from JWT UTILS");
@@ -103,7 +103,7 @@ public class JwtFilter extends OncePerRequestFilter{
 		return "user".equalsIgnoreCase((String) claims.get("role"));
 	}
 
-	public String getCurrentUser() {
+	public String getCurrentUser() {   // returns the email id that is currently logged in
 		return userName;
 	}
 

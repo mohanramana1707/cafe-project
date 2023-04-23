@@ -33,7 +33,7 @@ public class JwtUtil {
 		
 		log.error("jwtUtil class: EXTRACT UserName ");
 		
-		return extractClaim(token, Claims::getSubject);
+		return extractClaim(token, Claims::getSubject);  // get subject returns email id of the principle
 	}
 	
 	
