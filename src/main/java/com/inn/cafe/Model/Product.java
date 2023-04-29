@@ -2,41 +2,37 @@ package com.inn.cafe.Model;
 
 import java.io.Serializable;
 
+
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
-
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
 import lombok.Data;
 
 
 
-//Category is ENTITY Name(class name) not table name
-// subquery = return categoryids(FK) of the products whose status is true.(ie. product which are under any category)
-// mainquery= return the category details of only those category ids
 
-@NamedQuery(name = "Category.getAllCategory", query = "select c from Category c where c.id in(select p.category from Product p where p.status='true')") 
-
-
-
+@NamedQuery(name = "Product.getAllProduct",query = "select new com.inn.cafe.Wrapper.ProductWrapper(p.id,p.name,p.description,p.price,p.status,p.category.id,p.category.name ) from Product p")
 
 @Data
 @Entity
 @DynamicInsert
 @DynamicUpdate
-@Table(name = "category")
-public class Category  implements Serializable{/**
+@Table(name = "product")
+public class Product implements Serializable{/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
@@ -45,6 +41,21 @@ public class Category  implements Serializable{/**
 	@Column(name = "name")
 	private String name;
 	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "category_fk",nullable = false)
+	private Category category;
+	
+	@Column(name="description")
+	private String description;
+	
+	@Column(name="price")
+	private Integer price;
+	
+	@Column(name = "status")
+	private String status;
 	
 	
+	
+	
+
 }

@@ -86,7 +86,8 @@ public class CategoryServiceImpl  implements CategoryService{
 	
 //***************************************************************************************************************************************************
 
-// GET a list of all category	
+// GET a list of all category	if filtervalue is FALSE(request param)
+// else if FILTER VALUE is true, returns CATEGORY which has PRODUCTS in it...(refer namedQ in Category model)
 	@Override
 	public ResponseEntity<List<Category>> getAllCategory(String filterValue) {
 		try {
@@ -95,6 +96,7 @@ public class CategoryServiceImpl  implements CategoryService{
 				log.info("inside if");
 				return new ResponseEntity<List<Category>>(categoryDao.getAllCategory(),HttpStatus.OK);
 			}
+			
 			return new ResponseEntity<List<Category>>(categoryDao.findAll(),HttpStatus.OK);
 			
 		} catch (Exception e) {
@@ -121,8 +123,7 @@ public class CategoryServiceImpl  implements CategoryService{
 						
 						categoryDao.save(getCategoryFromMap(requestMap, true));
 						
-						return CafeUtils.getResponseEntity("category updated successfully", HttpStatus.OK);
-						
+						return CafeUtils.getResponseEntity("category updated successfully", HttpStatus.OK);	
 						
 					}
 					else 
